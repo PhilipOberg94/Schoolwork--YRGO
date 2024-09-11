@@ -25,6 +25,7 @@ def transfer_function_low_pass_filter(frequency, i, R, C):
     H_j_omega = (1 / np.sqrt(j_omega_RC + 1) ** 2)
     magnitude = abs(H_j_omega)
     decibel = 20 * np.log10(magnitude)
+    
     print(f"Omega: {omega:.3f}")
     print(f"H(jω) = {magnitude:.3f}")
     print(f"Decibel: {decibel:.3f}")
