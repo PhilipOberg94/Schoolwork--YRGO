@@ -1,13 +1,8 @@
-<<<<<<< HEAD
 import spidev # To handle SPI communication
-=======
-import spidev
->>>>>>> 715ace08a10e8de75951ce00def8e7fdc96dfd67
 import time
 import os
 import glob
 import paho.mqtt.client as mqtt
-<<<<<<< HEAD
 import threading  # To handle threads
 import RPi.GPIO as GPIO
 
@@ -17,31 +12,11 @@ class led:
         self.pin = pin
         self.setup_gpio()
         GPIO.setwarnings(False)
-=======
-import threading  # För att hantera trådning
-import RPi.GPIO as GPIO
-
-class ledColor:
-    blue = 0.03
-    green = 0.02
-    yellow = 0.02
-    red = 0.02
-
-class led:
-    def __init__(self, mA:float, on: bool , pin):
-        self.mA = mA
-        self.on = on
-        self.pin = pin
-        self.setup_gpio()
->>>>>>> 715ace08a10e8de75951ce00def8e7fdc96dfd67
 
     def setup_gpio(self):
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(self.pin, GPIO.OUT)
-<<<<<<< HEAD
         
-=======
->>>>>>> 715ace08a10e8de75951ce00def8e7fdc96dfd67
 
     def turnOn(self):
         self.on = True
@@ -56,7 +31,6 @@ class leds:
         self.leds = leds
         self.delay = delay
         self.activeLed = 0
-<<<<<<< HEAD
         self.running = True
         self.runningLight = threading.Thread(target=self.startRunningLight)
 
@@ -69,36 +43,11 @@ class leds:
                 time.sleep(self.delay)
                 self.activeLed = (self.activeLed + 1) % len(self.leds)
                 self.leds[self.activeLed].turnOn()
-=======
-        self.running = False
-        self.runningLight = threading.Thread(target=self.startRunningLight)
-
-
-    def mAmps(self):
-       mA = 0.0
-       for i in self.leds:
-            mA += i.mA
-       return mA
-
-    def startRunningLight(self):
-        self.running = True
-        while self.running:
-            for d in self.leds:
-                d.turnOn()
-            self.leds[self.activeLed].turnOff()
-            time.sleep(self.delay)
-            self.activeLed = (self.activeLed + 1) % len(self.leds)
-            self.leds[self.activeLed].turnOn()
->>>>>>> 715ace08a10e8de75951ce00def8e7fdc96dfd67
 
     def stopRunningLight(self):
         self.running = False  # Set the flag to False to stop the running light
         if self.runningLight.is_alive():
-<<<<<<< HEAD
             self.runningLight.join()    # Wait for the thread to finish
-=======
-            self.runningLight.join()
->>>>>>> 715ace08a10e8de75951ce00def8e7fdc96dfd67
         for d in self.leds:
             d.turnOff()  # Turn off all LEDs
         print("All LEDs turned off")
@@ -110,29 +59,14 @@ class TempReader:
     def __init__(self):
         os.system('modprobe w1-gpio')
         os.system('modprobe w1-therm')
-<<<<<<< HEAD
-=======
-
->>>>>>> 715ace08a10e8de75951ce00def8e7fdc96dfd67
         self.base_dir = '/sys/bus/w1/devices/'
         self.device_folder = glob.glob(self.base_dir + '28*')[0]
         self.device_file = self.device_folder + '/w1_slave'
 
-<<<<<<< HEAD
     def read_temp_raw(self): # Read the raw temperature data
         with open(self.device_file, 'r') as f:
             lines = f.readlines()
         return lines
-=======
-    def read_temp_raw(self):
-        try:
-            with open(self.device_file, 'r') as f:
-                lines = f.readlines()
-            return lines
-        except FileNotFoundError:
-            print("Temperature sensor file not found.")
-            return []
->>>>>>> 715ace08a10e8de75951ce00def8e7fdc96dfd67
 
     def read_temp(self):
         lines = self.read_temp_raw()
@@ -151,14 +85,9 @@ class TempReader:
 # Mqtt-client
 # -------------------------------------------------------------
 class MQTTClient:
-<<<<<<< HEAD
     def __init__(self, running_leds, temp_reader):
         self.running = True
         self.base_dir = '/sys/bus/w1/devices/'
-=======
-    def __init__(self, running_leds, temp_reader, base_dir='/sys/bus/w1/devices/', broker_address="test.mosquitto.org", port=1883, keepalive=60):
-        self.base_dir = base_dir
->>>>>>> 715ace08a10e8de75951ce00def8e7fdc96dfd67
         self.running_leds = running_leds
         self.temp_reader = temp_reader
         self.device_folder = glob.glob(self.base_dir + '28*')[0]
@@ -166,7 +95,6 @@ class MQTTClient:
         self.client = mqtt.Client()
         self.client.on_connect = self.on_connect
         self.client.on_message = self.on_message
-<<<<<<< HEAD
         self.client.connect("test.mosquitto.org", 1883, 60)
         self.desired_temp = None  # Add attribute to store desired temperature
         
@@ -179,19 +107,6 @@ class MQTTClient:
         with open(self.device_file, 'r') as f:
                 lines = f.readlines()
         return lines
-=======
-        self.client.connect(broker_address, port, keepalive)
-        self.desired_temp = None  # Add attribute to store desired temperature
-
-    def read_temp_raw(self):
-        try:
-            with open(self.device_file, 'r') as f:
-                lines = f.readlines()
-            return lines
-        except FileNotFoundError:
-            print("Temperature sensor file not found.")
-            return []
->>>>>>> 715ace08a10e8de75951ce00def8e7fdc96dfd67
 
     def read_temp(self):
         lines = self.read_temp_raw()
@@ -203,7 +118,6 @@ class MQTTClient:
                 return f"{temp_c:.3f}"
         return "Error"  
 
-<<<<<<< HEAD
     # The callback for when the client connects to the server
     def on_connect(self, client, userdata, flags, rc):
         # Subscribing in on_connect() means that 
@@ -234,48 +148,6 @@ class MQTTClient:
 
     def publish_temperature(self):
         while self.running:
-=======
-    def on_connect(self, client, userdata, flags, rc):
-        print(f"Connected with result code {rc}")
-        client.subscribe("ela23/Öberg_sp")
-
-    def on_message(self, client, userdata, msg):
-        compare_payload = msg.payload.decode('utf-8')
-        print(f"Desired temperature received: {compare_payload}")
-        
-        try:
-            self.desired_temp = float(compare_payload)
-        except ValueError:
-            print("Error converting desired temperature to float")
-            return
-
-    def compare_temperatures(self):
-        while True:
-            if self.desired_temp is not None:
-                current_temp = self.temp_reader.read_temp()
-                print(f"Current temperature: {current_temp}")
-                
-                try:
-                    current_temp_float = float(current_temp)
-                except ValueError:
-                    print("Error converting current temperature to float")
-                    continue
-                
-                print(f"Comparing current temperature ({current_temp_float}) with desired temperature ({self.desired_temp})")
-                if current_temp_float <= self.desired_temp:
-                    print("Turning on the heater")
-                    if not self.running_leds.runningLight.is_alive():
-                        self.running_leds.runningLight = threading.Thread(target=self.running_leds.startRunningLight)
-                        self.running_leds.runningLight.start()
-                else:
-                    print("Turning off the heater")
-                    if self.running_leds.runningLight.is_alive():
-                        self.running_leds.stopRunningLight()
-            time.sleep(1)  # Check every second
-
-    def publish_temperature(self):
-        while True:
->>>>>>> 715ace08a10e8de75951ce00def8e7fdc96dfd67
             temp_str = self.read_temp()  # Read temperature
             self.last_published_temp = temp_str
             print(f"Publishing temperature: {temp_str}")
@@ -287,7 +159,6 @@ class MQTTClient:
         self.client.loop_forever()  # Block and wait for messages
 
     def start(self):
-<<<<<<< HEAD
         self.publish_thread.start()  # Start the publish thread
         self.receive_thread.start()  # Start the receive thread
         self.compare_thread.start()  # Start the comparison thread
@@ -302,15 +173,6 @@ class MQTTClient:
         leds.stopRunningLight()
         GPIO.cleanup()
         self.client.disconnect()
-=======
-        publish_thread = threading.Thread(target=self.publish_temperature)
-        receive_thread = threading.Thread(target=self.listen_for_messages)
-        compare_thread = threading.Thread(target=self.compare_temperatures)  # Start comparison thread
-
-        publish_thread.start()
-        receive_thread.start()
-        compare_thread.start()  # Start the comparison thread
->>>>>>> 715ace08a10e8de75951ce00def8e7fdc96dfd67
 # -------------------------------------------------------------
 # MAX7219 Initialization for 7-segment display
 # -------------------------------------------------------------
@@ -344,10 +206,6 @@ class Display:
         self.spi.xfer2([position, segment_value])  # Send position and segment data
 
     def display_number(self, number_str):
-<<<<<<< HEAD
-=======
-        length = len(number_str.replace('.', ''))  # Count of digits without decimal points
->>>>>>> 715ace08a10e8de75951ce00def8e7fdc96dfd67
         position = 8
         i = 0
         while i < len(number_str):
@@ -364,23 +222,13 @@ class Display:
         for position in range(1, 9):
             self.spi.xfer2([position, 0b00000000])
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 715ace08a10e8de75951ce00def8e7fdc96dfd67
 # -------------------------------------------------------------
 # Main logic for the program
 # -------------------------------------------------------------
 # Initialize LEDs
-<<<<<<< HEAD
 LED1 = led(False, 22)
 LED2 = led(False, 27)
 LED3 = led(False, 17)
-=======
-LED1 = led(20.0, False, 22)
-LED2 = led(20.0, False, 27)
-LED3 = led(20.0, False, 17)
->>>>>>> 715ace08a10e8de75951ce00def8e7fdc96dfd67
 leds_list = [LED1, LED2, LED3]
 running_leds = leds(leds_list, 0.5)
 
@@ -396,27 +244,15 @@ display = Display()
 display.initialize()
 display.clear_display()
 
-<<<<<<< HEAD
 # Shutdown variable
 running = True
 
-=======
->>>>>>> 715ace08a10e8de75951ce00def8e7fdc96dfd67
 try:
     while True:
         temp_str = temp_reader.read_temp()  # Läs temperaturen
         display.display_number(temp_str)  # Visa temperaturen på displayen
         time.sleep(1)  # Uppdatera varje sekund
 except KeyboardInterrupt:
-<<<<<<< HEAD
     print("Program is shutting down, please wait...")
     mqtt_client.shutdown_mqtt()
 
-=======
-    pass
-finally:
-    display.clear_display()
-    display.spi.close()  # Stäng SPI-gränssnittet när programmet avslutas
-    running_leds.stopRunningLight()
-    GPIO.cleanup()
->>>>>>> 715ace08a10e8de75951ce00def8e7fdc96dfd67
