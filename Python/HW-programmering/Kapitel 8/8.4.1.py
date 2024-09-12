@@ -16,7 +16,7 @@ f = str(c * 1.8 + 32)
 
 if f != 0:
     try:
-        fil = open('temp.txt', 'w')
+        fil = open('/home/oberg/Schoolwork--YRGO/Python/HW-programmering/Kapitel 8/temp.txt', 'w')
         fil.write (f)
     except FileExistsError:
         print("Filen finns inte")
@@ -24,7 +24,7 @@ if f != 0:
         print("Du försöker mata in något annat än int eller float")
         f = 0
     else:
-        print(f"Temperaturen är: {f}\n")
+        print(f"Temperaturen är: {f:.6}")
 else:
     print("Du försöker mata in något annat än int eller float")
     f = 0

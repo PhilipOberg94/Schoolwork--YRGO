@@ -12,7 +12,7 @@
 
 rakna = dict()
 try:
-    fil = str(input("Vilken fil vill du öppna?"))
+    fil = str(input("Vilken fil vill du öppna? "))
     fil = open(fil, 'r')
 except FileNotFoundError or ValueError:
     print("\nDenna fil finns inte")
