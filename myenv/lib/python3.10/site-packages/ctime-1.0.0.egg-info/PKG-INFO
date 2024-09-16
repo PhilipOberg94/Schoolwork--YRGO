@@ -1,0 +1,49 @@
+Metadata-Version: 2.1
+Name: ctime
+Version: 1.0.0
+Summary: ctime is a python library for how long does the function takes for execute completally
+Home-page: UNKNOWN
+Author: mi66mc
+Author-email: miguelmalgarezi@gmail.com
+License: MIT
+Keywords: time
+Platform: UNKNOWN
+Classifier: Development Status :: 5 - Production/Stable
+Classifier: Intended Audience :: Education
+Classifier: Operating System :: Microsoft :: Windows :: Windows 10
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Programming Language :: Python :: 3
+Description-Content-Type: text/markdown
+License-File: LICENSE
+
+# ctime
+
+ctime is a python library for how long does the function takes for execute completally
+
+## Installation
+
+Use the package manager [pip](https://pip.pypa.io/en/stable/) to install ctime.
+
+```bash
+pip install ctime
+```
+
+## Usage
+
+```python
+import ctime
+
+@ctime.ctime() # Optional args: simplified, printable
+def function():
+    ... # Your code
+    
+function()
+```
+
+```
+Function "function_name" took X seconds.
+```
+
+## License
+[MIT](https://choosealicense.com/licenses/mit/)
+
