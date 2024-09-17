@@ -38,20 +38,21 @@ def fourier_transform_sawtooth_wave(numbers_array, file):
 
 def transfer_function_low_pass_filter(numbers_array, frequency, R, C, file):
     with open(file, 'a') as f:
-        f.write("\n_______________Low-pass filter_______________\n")
-        f.write("_______________________________________________\n")
-        f.write("Value of Omega | Value of H(jω) | Value of H(jω) in decibel\n")
+        f.write("\n_______________Low-pass filter____________________________________________________\n")
+        f.write("____________________________________________________________________________________\n")
+        f.write("Value of Omega | Value of H(jω) | Value of H(jω) in decibel | Value of H(jω) in VRMS\n")
         f.write("--------------------------------------------------------------\n")
-        print("\n___________________Low-pass filter____________________\n")
-        print("_______________________________________________")
-        print("Value of Omega  | Value of H(jω) | Value of H(jω) in decibel")
-        print("--------------------------------------------------------------")
+        print("\n___________________Low-pass filter__________________________________________________\n")
+        print("______________________________________________________________________________________")
+        print("Value of Omega  | Value of H(jω) | Value of H(jω) in decibel | Value of H(jω) in VRMS")
+        print("--------------------------------------------------------------------------------------")
         for i in range(len(numbers_array)):
             omega = 2 * np.pi * frequency * numbers_array[i]
             magnitude = 1 / np.sqrt(1 + (omega * R * C) ** 2)
             decibel = 20 * np.log10(magnitude)
-            print(f"{omega:<15.3f} | {magnitude:<15.3f} | {decibel:<14.3f}")
-            f.write(f"{omega:<15.3f} | {magnitude:<15.3f} | {decibel:<14.3f} db\n")
+            dbVRMS = magnitude / np.sqrt(2)
+            print(f"{omega:<15.3f} | {magnitude:<15.3f} | {decibel:<14.3f} db | {dbVRMS:.3f} VRMS")
+            f.write(f"{omega:<15.3f} | {magnitude:<15.3f} | {decibel:<14.3f} db | {dbVRMS:.3f} VRMS\n")
 
 # Example usage
 numbers_array = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
