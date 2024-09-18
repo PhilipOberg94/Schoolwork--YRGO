@@ -48,9 +48,9 @@ def transfer_function_low_pass_filter(numbers_array, frequency, R, C, file):
         for n in numbers_array:
             omega = 2 * np.pi * frequency * n
             H = abs(1 / np.sqrt(1 + (omega * R * C) ** 2))
-            dbVRMS = 20 * np.log10(H / np.sqrt(2))
-            f.write(f"{n:<12} | {H:<12.3f} | {dbVRMS:.3f} VRMS\n")
-            print(f"{n:<12} | {H:<12.3f} | {dbVRMS:.3f} VRMS")
+            decibel = 20 * np.log10(H / np.sqrt(2))
+            f.write(f"{n:<12} | {H:<12.3f} | {decibel:.3f} db\n")
+            print(f"{n:<12} | {H:<12.3f} | {decibel:.3f} db")
 
 def cutoff_frequency_low_pass_filter(R, C, file):
     cutoff_frequency = 1 / (2 * np.pi * R * C)
@@ -62,16 +62,12 @@ def cutoff_frequency_low_pass_filter(R, C, file):
         print("___________________________________")
         print(f"Cutoff frequency: {cutoff_frequency:.3f} Hz")
         
-
-
-
-# Example usage
 numbers_array = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
 frequency = 1000  # 1 kHz
 R = 8200  # 1 kOhm
 C = 10 * 10 ** -9  # 10 nF
 
-output_file = './Labration - Frekvensanalys1.txt'
+output_file = './Frekvensanalys_output.txt'
 fourier_transform_triangle_wave(numbers_array, output_file)
 print("")
 fourier_transform_sawtooth_wave(numbers_array, output_file)
