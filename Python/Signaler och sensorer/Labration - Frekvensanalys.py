@@ -16,8 +16,8 @@ def fourier_transform_triangle_wave(numbers_array, file):
             else:
                 Bn = ((8 * 2.5) / ((np.pi ** 2) * (n ** 2))) * (-1 ** ((n - 1) / 2)) # Equation to calculate the value of Bn for a triangle wave
                 dbVRMS = 20 * np.log10(abs(Bn) / np.sqrt(2))        # Equation to calculate the value of Bn in decibel
-            f.write(f"{n:<12} | {dbVRMS:.3f} db\n")
-            print(f"{n:<12} | {dbVRMS:.3f} db")
+            f.write(f"{n:<12} | {dbVRMS:.3f} dbVRMS\n")
+            print(f"{n:<12} | {dbVRMS:.3f} dbVRMS")
 
 def fourier_transform_sawtooth_wave(numbers_array, file):
     with open(file, 'a') as f: 
@@ -32,8 +32,8 @@ def fourier_transform_sawtooth_wave(numbers_array, file):
         for n in numbers_array:
             Bn = abs(((2 * 2.5) / (np.pi * n)) * ((-1) ** (n - 1))) # Equation to calculate Bn on a sawtooth wave
             dbVRMS = 20 * np.log10(Bn / np.sqrt(2))                 # Equation to calculate the value of Bn in decibel
-            f.write(f"{n:<12} | {dbVRMS:.3f} db\n")
-            print(f"{n:<12} | {dbVRMS:.3f} db")
+            f.write(f"{n:<12} | {dbVRMS:.3f} dbVRMS\n")
+            print(f"{n:<12} | {dbVRMS:.3f} dbVRMS")
 
 def transfer_function_low_pass_filter(numbers_array, frequency, R, C, file):
     with open(file, 'a') as f:
@@ -48,9 +48,9 @@ def transfer_function_low_pass_filter(numbers_array, frequency, R, C, file):
         for n in numbers_array:
             omega = 2 * np.pi * frequency * n
             H = abs(1 / np.sqrt(1 + (omega * R * C) ** 2))          # Equation to calculate the magnitude of the transfer function
-            decibel = 20 * np.log10(H / np.sqrt(2))                 # Equation to calculate the magnitude in decibel
-            f.write(f"{n:<12} | {H:<12.3f} | {decibel:.3f} db\n")
-            print(f"{n:<12} | {H:<12.3f} | {decibel:.3f} db")
+            dbVRMS = 20 * np.log10(H / np.sqrt(2))                 # Equation to calculate the magnitude in decibel
+            f.write(f"{n:<12} | {H:<12.3f} | {dbVRMS:.3f} dbVRMS\n")
+            print(f"{n:<12} | {H:<12.3f} | {dbVRMS:.3f} dbVRMS")
 
 def cutoff_frequency_low_pass_filter(R, C, file):
     cutoff_frequency = 1 / (2 * np.pi * R * C)                      # Equation to calculate the cutoff frequency
