@@ -3,7 +3,7 @@ import glob
 import time
 
 # -------------------------------------------------------------
-# Temperaturavläsning
+# Temperature reader
 # -------------------------------------------------------------
 class TempReader:
     def __init__(self):
@@ -18,7 +18,7 @@ class TempReader:
             lines = f.readlines()
         return lines
 
-    def read_temp(self):
+    def read_temp(self): # Convert the raw temperature data to a float-value
         lines = self.read_temp_raw()
         while lines and lines[0].strip()[-3:] != 'YES':
             time.sleep(0.2)

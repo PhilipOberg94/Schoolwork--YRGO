@@ -40,10 +40,20 @@ class leds:
                 self.activeLed = (self.activeLed + 1) % len(self.leds)
                 self.leds[self.activeLed].turnOn()
 
+    def start(self):
+        if not self.runningLight.is_alive():
+            self.running = True
+            self.runningLight = threading.Thread(target=self.startRunningLight)
+            self.runningLight.start()
+            print("Running light thread started")
+
     def stopRunningLight(self):
-        self.running = False  # Set the flag to False to stop the running light
+        self.running = False
         if self.runningLight.is_alive():
-            self.runningLight.join()    # Wait for the thread to finish
+            self.runningLight.join()
+            print("Running light thread stopped")
         for d in self.leds:
-            d.turnOff()  # Turn off all LEDs
-        print("All LEDs turned off")
+            d.turnOff()
+
+
+        
