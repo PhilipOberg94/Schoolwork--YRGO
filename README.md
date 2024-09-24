@@ -9,8 +9,6 @@ The repository is structured into different directories, each containing relevan
 
 - **ML/**: Contains files related to machine learning assignments. Current work includes a linear regression program.
 - **Python/**: Contains Python programs showcasing various skills and applications.
-- **.gitignore**: Specifies files to be ignored in this repository.
-- **Frekvensanalys_output.txt**: Contains output from frequency analysis experiments, where value labels have been updated based on recent changes in the signal processing tasks.
 
 ## Projects
 
