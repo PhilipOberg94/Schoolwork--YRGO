@@ -2,6 +2,9 @@ import RPi.GPIO as GPIO
 import time
 import threading
 
+# -------------------------------------------------------------
+# Control the LEDs
+# -------------------------------------------------------------
 class led:
     def __init__(self, on: bool , pin):
         self.on = on

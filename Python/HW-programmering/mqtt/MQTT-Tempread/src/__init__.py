@@ -1,3 +1,5 @@
+
+
 import RPi.GPIO as GPIO
 
 from .led import led, leds           # Import the LED classes
@@ -6,6 +8,9 @@ from .display import Display         # Import the Display class
 from .mqttclient import MQTTClient   # Import the MQTTClient class
 from .plot import Plotter            # Import the Plotter class
 
+# -------------------------------------------------------------
+# Init file for the MQTT-Tempread project
+# -------------------------------------------------------------
 
 # Disable GPIO warnings
 GPIO.setwarnings(False)
