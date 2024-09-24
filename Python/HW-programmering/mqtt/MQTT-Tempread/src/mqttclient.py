@@ -22,6 +22,7 @@ class MQTTClient:
         self.client.tls_set(tls_version=mqtt.ssl.PROTOCOL_TLS)
         self.client.username_pw_set('oberg94', 'secure1234')
         self.client.connect("a26e229443d3481cb2008a6ffe6c1a97.s1.eu.hivemq.cloud", 8883)
+        self.client.subscribe("Öberg_sp", qos=1)
         self.desired_temp = 21  # Set a default desired temperature if no message is received
         print("MQTT client initialized and desired temperature set to 21")
         
@@ -96,7 +97,6 @@ class MQTTClient:
             time.sleep(1)  # Wait 1 second before next publish
 
     def listen_for_messages(self):
-        self.client.subscribe("Öberg_sp", qos=1)
         self.client.loop_forever()  # Block and wait for messages
 
     def start(self):
