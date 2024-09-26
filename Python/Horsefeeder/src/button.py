@@ -1,20 +1,23 @@
-import RPi.GPIO as GPIO
+import board
+import digitalio
 
 class ButtonManager:
     def __init__(self):
-        # Set up GPIO pin numbers for the buttons
-        self.button_pins = {
-            'up': 17,    # Replace with the GPIO pin for the "up" button
-            'down': 27   # Replace with the GPIO pin for the "down" button
-        }
-        GPIO.setmode(GPIO.BCM)  # Use BCM numbering
-        GPIO.setup(self.button_pins['up'], GPIO.IN, pull_up_down=GPIO.PUD_UP)  # Set up "up" button with pull-up
-        GPIO.setup(self.button_pins['down'], GPIO.IN, pull_up_down=GPIO.PUD_UP)  # Set up "down" button with pull-up
+        # Button pins setup
+        self.button_up = digitalio.DigitalInOut(board.D27)
+        self.button_down = digitalio.DigitalInOut(board.D23)
+        self.button_select = digitalio.DigitalInOut(board.D24)
+        
+        # Setup input with pull-up resistors
+        for button in [self.button_up, self.button_down, self.button_select]:
+            button.direction = digitalio.Direction.INPUT
+            button.pull = digitalio.Pull.UP
 
     def read_button(self):
-        if GPIO.input(self.button_pins['up']) == GPIO.LOW:
+        if not self.button_up.value:
             return 'up'
-        elif GPIO.input(self.button_pins['down']) == GPIO.LOW:
+        if not self.button_down.value:
             return 'down'
-        else:
-            return None
+        if not self.button_select.value:
+            return 'select'
+        return None
