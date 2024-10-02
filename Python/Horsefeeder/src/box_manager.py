@@ -14,4 +14,4 @@ class BoxManager:
 
     def get_boxtime(self):
         """Returns the current box time."""
-        return self.boxtime.strftime('%H:%M:%S')
+        return self.boxtime.strftime('%H:%M')

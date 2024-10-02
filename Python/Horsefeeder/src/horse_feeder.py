@@ -1,17 +1,17 @@
-import i2c_lcd
-import button
-import relay_control
-import box_manager
-import time_manager
+from i2c_lcd import I2CLCD
+from button import ButtonManager
+from relay_control import RelayControl
+from box_manager import BoxManager
+from time_manager import TimeManager
 import time
 
 class HorseFeeder:
     def __init__(self):
-        self.lcd = i2c_lcd.I2CLCD()
-        self.buttons = button.ButtonManager()
-        self.relay_control = relay_control.RelayControl()
-        self.box_manager = box_manager.BoxManager()
-        self.time_manager = time_manager.TimeManager()
+        self.lcd = I2CLCD()  # Use the new I2C-based LCD
+        self.buttons = ButtonManager()
+        self.box_manager = BoxManager()
+        self.relay_control = RelayControl(self.box_manager)
+        self.time_manager = TimeManager()
 
     def run(self):
         """Main loop to check the time, handle buttons, and activate relay."""
@@ -32,13 +32,17 @@ class HorseFeeder:
 
                 # Check if it's time to open the box
                 if self.time_manager.compare_time(current_time, box_time):
-                    self.relay_control.activate_relay()
+                    self.relay_control.activate_solenoid(1)
 
                 # Display current time and box time on the LCD
-                self.lcd.display_message(f"Time: {current_time.strftime('%H:%M')}", 1)
-                self.lcd.display_message(f"Box 1&2: {box_time[:5]}", 2)
+                self.lcd.display_message(f"Time: {current_time}", 1)
 
-                time.sleep(1)  # Update every second
+                time.sleep(1)
+                
+                self.lcd.display_message(f"Box 1&2: {box_time}", 2)
+
+                time.sleep(1)
+
         except KeyboardInterrupt:
             self.lcd.clear()
             print("Program stopped by user.")

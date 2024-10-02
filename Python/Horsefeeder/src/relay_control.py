@@ -1,5 +1,5 @@
 import RPi.GPIO as GPIO
-from . import time_manager
+import time_manager
 
 class RelayControl:
     def __init__(self, box_manager):
