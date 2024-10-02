@@ -1,6 +1,7 @@
 /********************************************************************************
  * @brief Demonstration of GPIO device drivers in C++.
  ********************************************************************************/
+#include "adc.h"
 #include "gpio.h"
 #include "timer.h"
 #include "watchdog.h"
@@ -9,6 +10,9 @@ using namespace driver;
 
 namespace 
 {
+
+constexpr uint8_t tempSensorPin{2};
+constexpr uint8_t double Vcc{5.0};
 
 /********************************************************************************
  * @brief Devices used in the embedded system.
@@ -23,6 +27,11 @@ GPIO led1{9, GPIO::Direction::Output};
 GPIO button1{13, GPIO::Direction::InputPullup};
 Timer timer0{Timer::Circuit::Timer0, 300};
 Timer timer1{Timer::Circuit::Timer1, 100};
+
+double inputVoltage(const uint8_t pin)
+{
+    return adc::getDutyCycle(pin) * Vcc;
+}
 
 /********************************************************************************
  * @brief Callback routine called when button1 is pressed or released.
@@ -67,6 +76,8 @@ void timer1Callback(void)
  ********************************************************************************/
 inline void setup(void) 
 {
+    adc::init();
+    
     button1.addCallback(buttonCallback);
     timer0.addCallback(timer0Callback);
     timer1.addCallback(timer1Callback);
