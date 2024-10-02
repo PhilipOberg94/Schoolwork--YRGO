@@ -1,23 +1,20 @@
-import board
 import digitalio
+import board
 
 class ButtonManager:
     def __init__(self):
-        # Button pins setup
-        self.button_up = digitalio.DigitalInOut(board.D27)
-        self.button_down = digitalio.DigitalInOut(board.D23)
-        self.button_select = digitalio.DigitalInOut(board.D24)
-        
-        # Setup input with pull-up resistors
-        for button in [self.button_up, self.button_down, self.button_select]:
-            button.direction = digitalio.Direction.INPUT
-            button.pull = digitalio.Pull.UP
+        self.button_inc = digitalio.DigitalInOut(board.D6)
+        self.button_inc.direction = digitalio.Direction.INPUT
+        self.button_inc.pull = digitalio.Pull.UP
 
-    def read_button(self):
-        if not self.button_up.value:
-            return 'up'
-        if not self.button_down.value:
-            return 'down'
-        if not self.button_select.value:
-            return 'select'
-        return None
+        self.button_dec = digitalio.DigitalInOut(board.D5)
+        self.button_dec.direction = digitalio.Direction.INPUT
+        self.button_dec.pull = digitalio.Pull.UP
+
+    def is_increment_pressed(self):
+        """Returns True if the increment button is pressed."""
+        return not self.button_inc.value  # Button is active-low
+
+    def is_decrement_pressed(self):
+        """Returns True if the decrement button is pressed."""
+        return not self.button_dec.value  # Button is active-low

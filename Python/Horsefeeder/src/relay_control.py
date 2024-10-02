@@ -1,5 +1,5 @@
 import RPi.GPIO as GPIO
-from time_manager import TimeManager
+from . import time_manager
 
 class RelayControl:
     def __init__(self, box_manager):
@@ -9,7 +9,7 @@ class RelayControl:
         }
         GPIO.setmode(GPIO.BCM)
         GPIO.setup(self.relay_pins[1], GPIO.OUT)
-        self.time_manager = TimeManager()
+        self.time_manager = time_manager.TimeManager()
 
     def activate_solenoid(self, box_number):
         GPIO.output(self.relay_pins[box_number], GPIO.HIGH)

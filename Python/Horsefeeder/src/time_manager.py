@@ -1,5 +1,5 @@
 from rtc import RTC
-from datetime import datetime
+import datetime
 
 class TimeManager:
     def __init__(self):

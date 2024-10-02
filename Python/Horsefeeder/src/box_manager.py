@@ -1,13 +1,17 @@
+from datetime import datetime, timedelta
+
 class BoxManager:
     def __init__(self):
-        self.box_times = {
-            1: (6, 30),  # Box 1 opens at 06:30
-            2: (7, 45),  # Box 2 opens at 07:45
-        }
+        self.boxtime = datetime.strptime("16:48:00", '%H:%M:%S')  # Initial box open time
 
-    def set_box_time(self, box_number, hour, minute):
-        self.box_times[box_number] = (hour, minute)
-        print(f"Box {box_number} set to open at {hour:02}:{minute:02}")
+    def increment_boxtime(self):
+        """Increment the box time by 15 minutes."""
+        self.boxtime += timedelta(minutes=15)
 
-    def get_box_time(self, box_number):
-        return self.box_times[box_number]
+    def decrement_boxtime(self):
+        """Decrement the box time by 15 minutes."""
+        self.boxtime -= timedelta(minutes=15)
+
+    def get_boxtime(self):
+        """Returns the current box time."""
+        return self.boxtime.strftime('%H:%M:%S')
