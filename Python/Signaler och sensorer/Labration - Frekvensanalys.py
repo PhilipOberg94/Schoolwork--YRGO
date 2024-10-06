@@ -52,8 +52,8 @@ def transfer_function_low_pass_filter(numbers_array, frequency, R, C, file):
         for n in numbers_array:
             omega = 2 * np.pi * frequency * n
             H = abs(1 / np.sqrt(1 + (omega * R * C) ** 2))          # Equation to calculate the magnitude of the transfer function
-            H *= B_values[n]
-            dbVRMS = 20 * np.log10(H / np.sqrt(2))                 # Equation to calculate the magnitude in decibel
+            Bn_num = H * B_values[n]
+            dbVRMS = 20 * np.log10(Bn_num / np.sqrt(2))                 # Equation to calculate the magnitude in decibel
             f.write(f"{n:<12} | {H:<12.3f} | {dbVRMS:<3.3f} dbVRMS\n")
             print(f"{n:<12} | {H:<12.3f} | {dbVRMS:<3.3f} dbVRMS")
 
