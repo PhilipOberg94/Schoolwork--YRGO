@@ -20,6 +20,7 @@ def fourier_transform_triangle_wave(numbers_array, file):
             print(f"{n:<12} | {dbVRMS:<3.3f} dbVRMS")
 
 def fourier_transform_sawtooth_wave(numbers_array, file):
+    Bn_values = {}
     with open(file, 'a') as f: 
         f.write("\n__________Sawtooth wave____________\n")          # Print function to write the text to the file  #
         f.write("__________________________________\n")             #                                               #
@@ -34,8 +35,11 @@ def fourier_transform_sawtooth_wave(numbers_array, file):
             dbVRMS = 20 * np.log10(Bn / np.sqrt(2))                 # Equation to calculate the value of Bn in decibel
             f.write(f"{n:<12} | {dbVRMS:<3.3f} dbVRMS\n")
             print(f"{n:<12} | {dbVRMS:<3.3f} dbVRMS")
+            Bn_values[n] = Bn
+    return Bn_values
 
 def transfer_function_low_pass_filter(numbers_array, frequency, R, C, file):
+    B_values = fourier_transform_sawtooth_wave(numbers_array, file)
     with open(file, 'a') as f:
         f.write("\n__________Low Pass Filter__________\n")        # Print function to write the text to the file  #
         f.write("___________________________________\n")          #                                               #
@@ -48,6 +52,7 @@ def transfer_function_low_pass_filter(numbers_array, frequency, R, C, file):
         for n in numbers_array:
             omega = 2 * np.pi * frequency * n
             H = abs(1 / np.sqrt(1 + (omega * R * C) ** 2))          # Equation to calculate the magnitude of the transfer function
+            H *= B_values[n]
             dbVRMS = 20 * np.log10(H / np.sqrt(2))                 # Equation to calculate the magnitude in decibel
             f.write(f"{n:<12} | {H:<12.3f} | {dbVRMS:<3.3f} dbVRMS\n")
             print(f"{n:<12} | {H:<12.3f} | {dbVRMS:<3.3f} dbVRMS")
@@ -67,7 +72,7 @@ frequency = 1000  # 1 kHz
 R = 8200  # 8,2 kOhm
 C = 10 * 10 ** -9  # 10 nF
 
-output_file = '/home/oberg94/Schoolwork--YRGO/Python/Signaler och sensorer/Frekvensanalys_output.txt'
+output_file = './Frekvensanalys_output.txt'
 fourier_transform_triangle_wave(numbers_array, output_file)
 print("")
 fourier_transform_sawtooth_wave(numbers_array, output_file)
