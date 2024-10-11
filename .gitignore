@@ -27,4 +27,6 @@ __pycache__/
 
 # Ignore vscode directory:
 *vscode/
+*.vscode
+
 
