@@ -1,8 +1,9 @@
 from datetime import datetime, timedelta
 
 class BoxManager:
-    def __init__(self):
-        self.boxtime = datetime.strptime("16:48:00", '%H:%M:%S')  # Initial box open time
+    def __init__(self, box_name, initial_time = datetime.strptime("16:48:00", '%H:%M:%S')):
+        self.box_name = box_name
+        self.boxtime = initial_time
 
     def increment_boxtime(self):
         """Increment the box time by 15 minutes."""

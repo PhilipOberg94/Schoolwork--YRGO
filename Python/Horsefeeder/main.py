@@ -6,7 +6,7 @@ import datetime
 
 sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
 
-from src import horse_feeder, button, relay_control, box_manager, time_manager, i2c_lcd
+from src import horse_feeder, relay_control, box_manager, time_manager, i2c_lcd
 
 
 def scan_i2c_bus(bus_number=1):

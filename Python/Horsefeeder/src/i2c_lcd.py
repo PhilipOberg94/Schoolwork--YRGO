@@ -17,11 +17,11 @@ class I2CLCD:
 
     def display_message(self, message, line=1):
         """Display a message on the LCD at the given line (1 or 2)."""
-        self.lcd.clear()  # Clear the display
+        #self.lcd.clear()  # Clear the display
         if line == 1:
-            self.lcd.cursor_position(1, 0)
+            self.lcd.cursor_position(0, 0)
         elif line == 2:
-            self.lcd.cursor_position(1, 1)
+            self.lcd.cursor_position(0, 1)
         self.lcd.message = message
 
     def clear(self):
@@ -29,5 +29,24 @@ class I2CLCD:
         self.lcd.clear()
 
     def set_color(self, r, g, b):
-        """Set the color of the LCD backlight."""
         self.lcd.color = [r, g, b]  # Set RGB color values
+    
+    @property
+    def up_button(self):
+        return self.lcd.up_button
+    
+    @property
+    def down_button(self):
+        return self.lcd.down_button
+    
+    @property
+    def left_button(self):
+        return self.lcd.left_button
+    
+    @property
+    def right_button(self):
+        return self.lcd.right_button
+    
+    @property
+    def select_button(self):
+        return self.lcd.select_button
