@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 
 class BoxManager:
-    def __init__(self, box_name, initial_time = datetime.strptime("16:48:00", '%H:%M:%S')):
+    def __init__(self, box_name, initial_time = datetime.strptime("12:00:00", '%H:%M:%S')):
         self.box_name = box_name
         self.boxtime = initial_time
 

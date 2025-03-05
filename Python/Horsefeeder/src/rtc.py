@@ -1,31 +1,37 @@
 import time
 import board
 import busio
-import adafruit_ds1307  # Assuming you're using the DS1307 RTC
-from datetime import datetime  # Corrected import statement
+import adafruit_ds1307
+from datetime import datetime
 
 class RTC:
     def __init__(self):
-        # Setup I2C connection
-        i2c = busio.I2C(board.SCL, board.SDA)
-        self.rtc = adafruit_ds1307.DS1307(i2c)
+        try:
+            # Setup I2C connection
+            i2c = busio.I2C(board.SCL, board.SDA)
+            self.rtc = adafruit_ds1307.DS1307(i2c)
+            print("RTC initialized successfully")
+        except Exception as e:
+            print(f"Failed to initialize RTC: {e}")
+            self.rtc = None
 
     def get_time(self):
-        # Get the current time from the RTC
-        if self.rtc.datetime is not None:
+        if self.rtc and self.rtc.datetime is not None:
             current_time_struct = self.rtc.datetime
             current_time = datetime.fromtimestamp(time.mktime(current_time_struct))
-            
             formatted_time = current_time.strftime('%H:%M')
-            # Convert datetime to time.struct_time
             return formatted_time
         else:
-            print("RTC not connected")
-            return time.localtime()
-            
+            print("RTC not connected or not responding")
+            return time.strftime('%H:%M', time.localtime())
 
-    def set_time(self, new_time):
-        # Convert time.struct_time to datetime
-        new_datetime = datetime.fromtimestamp(time.mktime(new_time))
-        # Set the RTC time (manually set the date/time)
-        self.rtc.datetime = new_datetime
+    def set_time(self, new_time_struct):
+        if self.rtc:
+            try:
+                # DS1307 expects a time.struct_time object
+                self.rtc.datetime = new_time_struct
+            except Exception as e:
+                print(f"Failed to set RTC time: {e}")
+        else:
+            print("RTC not available")
+
