@@ -6,7 +6,7 @@ import i2c_lcd
 from box_manager import BoxManager
 
 # Pico W TCP settings
-PICO_IP = "192.168.50.177"  # Update with Pico W’s IP from minicom
+PICO_IP = "192.168.4.3"  # Update with Pico W’s IP from minicom
 PORT = 8024
 
 class HorseFeeder:
