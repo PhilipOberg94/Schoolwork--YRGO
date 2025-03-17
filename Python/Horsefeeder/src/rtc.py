@@ -12,7 +12,7 @@ class RTC:
             self.rtc = adafruit_ds1307.DS1307(i2c)
             print("RTC initialized successfully")
         except Exception as e:
-            print(f"Failed to initialize RTC: {e}")
+            print(f"RTC not found, using system time as fallback: {e}")
             self.rtc = None
 
     def get_time(self):
@@ -22,16 +22,15 @@ class RTC:
             formatted_time = current_time.strftime('%H:%M')
             return formatted_time
         else:
-            print("RTC not connected or not responding")
+            # Fallback to system time
             return time.strftime('%H:%M', time.localtime())
 
     def set_time(self, new_time_struct):
         if self.rtc:
             try:
-                # DS1307 expects a time.struct_time object
                 self.rtc.datetime = new_time_struct
+                print("RTC time set")
             except Exception as e:
                 print(f"Failed to set RTC time: {e}")
         else:
-            print("RTC not available")
-
+            print("No RTC available, cannot set time")
