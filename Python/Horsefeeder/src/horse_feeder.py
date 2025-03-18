@@ -94,15 +94,27 @@ class HorseFeeder:
                     print("Select button pressed (no RTC to set)")
                     time.sleep(0.05)
 
-                # Update LCD
-                new_message_box = f"{current_box.box_name}: {current_box.get_boxtime()}"
-                if new_message_box != self.last_lcd_update[0]:
-                    print(f"Updating LCD line 2: {new_message_box}")
-                    self.lcd.display_message(new_message_box, 2)
-                    self.last_lcd_update[0] = new_message_box
-                print(f"Updating LCD line 1: Time: {current_time}")
-                self.lcd.display_message(f"Time: {current_time}", 1)
-                time.sleep(0.1)  # Slowed to 100ms to reduce I2C load
+                # Update LCD (16-char limit per line)
+                # Line 1: Current time (e.g., "Time: 14:30")
+                # Line 2: "Box 1&2 12:00" (when ON) or "Box 1&2 OFF" (when OFF)
+                time_message = f"Time: {current_time}"
+                if current_box.is_active():
+                    box_message = f"{current_box.box_name} {current_box.get_boxtime()}"
+                else:
+                    box_message = f"{current_box.box_name} OFF"
+                # Truncate to fit 16 chars if needed
+                box_message = box_message[:16]
+
+                if time_message != self.last_lcd_update[0]:
+                    print(f"Updating LCD line 1: {time_message}")
+                    self.lcd.display_message(time_message, 1)
+                    self.last_lcd_update[0] = time_message
+                if box_message != self.last_lcd_update[1]:
+                    print(f"Updating LCD line 2: {box_message}")
+                    self.lcd.display_message(box_message, 2)
+                    self.last_lcd_update[1] = box_message
+
+                time.sleep(0.1)
 
         except KeyboardInterrupt:
             self.lcd.clear()
