@@ -1,29 +1,117 @@
 import time
-import board
-import busio
+import smbus2
 import socket
+from datetime import datetime
 import i2c_lcd
+#import relay_control
+import time_manager
 from box_manager import BoxManager
 
-# Pico W TCP settings
-PICO_IP = "192.168.4.3"  # Update with Pico W’s IP from minicom
+# TCP configuration
+PICO_IP = "192.168.4.3"
 PORT = 8024
+MAX_RETRIES = 5
+RETRY_DELAY = 1.5
 
 class HorseFeeder:
     def __init__(self):
-        # I2C setup
-        print("Initializing LCD...")
-        self.lcd = i2c_lcd.I2CLCD()
-
-        # Box setup
+        self.lcd = i2c_lcd.I2CLCD()  # Use the new I2C-based LCD
         self.box_manager = [
-            BoxManager("Box 1&2"),
-            BoxManager("Box 3&4"),
-            BoxManager("Box 5&6"),
-            BoxManager("Box 7&8")
+            BoxManager("Box 1&2"),  # Maps to Group 1 (Relays 1&2)
+            BoxManager("Box 3&4"),  # Maps to Group 2 (Relays 3&4)
+            BoxManager("Box 5&6"),  # Maps to Group 3 (Relays 5&6)
+            BoxManager("Box 7&8")   # Maps to Group 4 (Relays 7&8)
         ]
+        self.time_manager = time_manager.TimeManager()
         self.box_index = 0
         self.last_lcd_update = ["", ""]
+        self.sock = None  # TCP socket
+        self.connect_to_pico()  # Establish initial connection
+
+    def connect_to_pico(self):
+        """Establish a connection to the Pico and update the socket."""
+        try:
+            if self.sock is not None:
+                self.sock.close()  # Close existing socket if any
+            self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            self.sock.settimeout(5)
+            print(f"Attempting to connect to {PICO_IP}:{PORT}")
+            with open("./output_file.txt", "a") as file:
+                current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                file.write(f"Log entry at {current_time}\n")
+                file.write(f"Attempting to connect to {PICO_IP}:{PORT}\n")
+            self.sock.connect((PICO_IP, PORT))
+            print("Connected to Pico")
+            with open("./output_file.txt", "a") as file:
+                file.write("Connected to Pico\n")
+        except ConnectionRefusedError:
+            print("Connection refused. Is the Pico server running?")
+            with open("./output_file.txt", "a") as file:
+                file.write("Connection refused. Is the Pico server running?\n")
+            self.sock = None
+        except socket.timeout:
+            print("Connection timed out. Check IP and network.")
+            with open("./output_file.txt", "a") as file:
+                file.write("Connection timed out. Check IP and network.\n")
+            self.sock = None
+        except Exception as e:
+            print(f"Error: {e}")
+            with open("./output_file.txt", "a") as file:
+                file.write(f"Error: {e}\n")
+            self.sock = None
+
+    def send_command(self, command):
+        """Send a command to the Pico with retries and return the response."""
+        if self.sock is None:
+            print("No connection available.")
+            return None
+        
+        for attempt in range(MAX_RETRIES):
+            with open("./output_file.txt", "a") as file:
+                current_time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                file.write(f"Log entry at {current_time}\n")
+                try:
+                    self.sock.send((command + "\r\n").encode())
+                    print(f"Sent command: {command} (Attempt {attempt + 1}/{MAX_RETRIES})")
+                    file.write(f"Sent command: {command} (Attempt {attempt + 1}/{MAX_RETRIES})\n")
+                    response = self.sock.recv(1024).decode().strip()
+                    print("Response:", response)
+                    file.write(f"Response: {response}\n")
+                    return response
+                except socket.timeout:
+                    print(f"Connection timed out during communication (Attempt {attempt + 1}/{MAX_RETRIES}).")
+                    file.write(f"Connection timed out during communication (Attempt {attempt + 1}/{MAX_RETRIES}).\n")
+                    if attempt < MAX_RETRIES - 1:
+                        print(f"Retrying in {RETRY_DELAY} second(s)...")
+                        time.sleep(RETRY_DELAY)
+                    continue
+                except Exception as e:
+                    print(f"Error: {e} (Attempt {attempt + 1}/{MAX_RETRIES})")
+                    file.write(f"Error: {e} (Attempt {attempt + 1}/{MAX_RETRIES})\n")
+                    if attempt < MAX_RETRIES - 1:
+                        print(f"Retrying in {RETRY_DELAY} second(s)...")
+                        time.sleep(RETRY_DELAY)
+                    continue
+        
+        print(f"Failed to get response after {MAX_RETRIES} attempts.")
+        with open("./output_file.txt", "a") as file:
+            file.write(f"Failed to get response after {MAX_RETRIES} attempts.\n")
+        return None
+
+    def activate_relay_group(self, group_num):
+        """Send TCP command to activate the specified relay group."""
+        command = f"Group {group_num}"
+        response = self.send_command(command)
+        if response is None:
+            print(f"Failed to activate {command}. Attempting to reconnect...")
+            self.connect_to_pico()
+            if self.sock is not None:
+                print("Reconnected successfully. Resending command...")
+                response = self.send_command(command)
+                if response is None:
+                    print(f"Still no response for {command} after reconnection.")
+                    return False
+        return True
 
     def switch_box(self, direction):
         if direction == "next":
@@ -32,95 +120,86 @@ class HorseFeeder:
             self.box_index = (self.box_index - 1) % len(self.box_manager)
         print(f"Switched to box {self.box_index + 1}")
 
-    def send_command(self, command):
-        """Send TCP command to Pico W."""
-        try:
-            print(f"Opening socket to {PICO_IP}:{PORT}...")
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.settimeout(5)
-            s.connect((PICO_IP, PORT))
-            print(f"Sending command: {command}")
-            s.send((command + "\r\n").encode())
-            response = s.recv(1024).decode().strip()
-            print(f"Received: {response}")
-            s.close()
-            return response
-        except Exception as e:
-            print(f"TCP Error: {e}")
-            return None
-
-    def get_time(self):
-        """Use system time until RTC is available."""
-        return time.strftime('%H:%M', time.localtime())
-
-    def compare_time(self, current_time, box_time):
-        return current_time == box_time
-
     def run(self):
-        print("Entering main loop...")
         try:
             while True:
-                current_time = self.get_time()
-                print(f"Current time: {current_time}")
-                
-                # Time-based relay activation
+                current_time = self.time_manager.get_time()
+
+                # Check each box's time slot and activate relays via TCP
                 for box_index, current_box in enumerate(self.box_manager):
                     box_time = current_box.get_boxtime()
-                    print(f"Checking box {box_index + 1}: {box_time}")
-                    if self.compare_time(current_time, box_time):
-                        group = f"Group {box_index + 1}"
-                        print(f"Time match for {group}")
-                        self.send_command(group)
+                    if self.time_manager.compare_time(box_time):  # Fixed: Only pass box_time
+                        group_num = box_index + 1  # Box 1&2 -> Group 1, Box 3&4 -> Group 2, etc.
+                        self.activate_relay_group(group_num)
 
-                # Button handling (LCD shield buttons)
                 current_box = self.box_manager[self.box_index]
+
+                # Handle button inputs
                 if self.lcd.up_button:
                     current_box.increment_boxtime()
                     print("Up button pressed")
                     time.sleep(0.05)
+
                 if self.lcd.down_button:
                     current_box.decrement_boxtime()
                     print("Down button pressed")
                     time.sleep(0.05)
+
                 if self.lcd.left_button:
-                    self.switch_box("previous")
                     print("Left button pressed")
+                    self.switch_box("previous")
                     time.sleep(0.05)
+
                 if self.lcd.right_button:
-                    self.switch_box("next")
                     print("Right button pressed")
+                    self.switch_box("next")
                     time.sleep(0.05)
+
                 if self.lcd.select_button:
-                    print("Select button pressed (no RTC to set)")
+                    self.time_manager.sync_with_system()  # Fixed: Use time_manager, call sync_with_system
+                    print("Select button pressed")
                     time.sleep(0.05)
 
-                # Update LCD (16-char limit per line)
-                # Line 1: Current time (e.g., "Time: 14:30")
-                # Line 2: "Box 1&2 12:00" (when ON) or "Box 1&2 OFF" (when OFF)
-                time_message = f"Time: {current_time}"
-                if current_box.is_active():
-                    box_message = f"{current_box.box_name} {current_box.get_boxtime()}"
-                else:
-                    box_message = f"{current_box.box_name} OFF"
-                # Truncate to fit 16 chars if needed
-                box_message = box_message[:16]
+                # Update LCD display
+                new_message_box = f"{current_box.box_name}: {current_box.get_boxtime()}"
+                if new_message_box != self.last_lcd_update[0]:
+                    self.lcd.display_message(new_message_box, 2)
+                    self.last_lcd_update[0] = new_message_box
+                
+                self.lcd.display_message(f"Time: {current_time}", 1)
 
-                if time_message != self.last_lcd_update[0]:
-                    print(f"Updating LCD line 1: {time_message}")
-                    self.lcd.display_message(time_message, 1)
-                    self.last_lcd_update[0] = time_message
-                if box_message != self.last_lcd_update[1]:
-                    print(f"Updating LCD line 2: {box_message}")
-                    self.lcd.display_message(box_message, 2)
-                    self.last_lcd_update[1] = box_message
-
-                time.sleep(0.1)
+                time.sleep(0.01)
 
         except KeyboardInterrupt:
             self.lcd.clear()
             print("Program stopped by user.")
+        finally:
+            if self.sock is not None:
+                self.sock.close()
+                print("TCP socket closed.")
+                with open("./output_file.txt", "a") as file:
+                    file.write("TCP socket closed.\n")
+
+def scan_i2c_bus(bus_number=1):
+    bus = smbus2.SMBus(bus_number)
+    devices = []
+    for address in range(0x03, 0x78):
+        try:
+            bus.read_byte(address)
+            devices.append(hex(address))
+        except OSError:
+            pass
+    bus.close()
+    return devices
 
 if __name__ == "__main__":
-    print("Starting HorseFeeder on Pi Zero...")
+    print("Scanning I2C bus for devices...")
+    devices = scan_i2c_bus()
+    if devices:
+        print(f"Found I2C devices at addresses: {', '.join(devices)}")
+    else:
+        print("No I2C devices found.")
+
+    # Initialize and run the HorseFeeder
     feeder = HorseFeeder()
     feeder.run()
